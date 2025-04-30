@@ -11,12 +11,31 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>recipe finder</title>
+    <title>Recipe Finder</title>
   </head>
   <body>
-    <nav class="nav-bar">
-      <i class="fa-solid fa-utensils"></i>
-      <h2>Recipe Finder</h2>
-    </nav>
+    <div class="container">
+      <h1>Find Recipes with Ingredients You Have</h1>
+
+      <div class="input-area">
+        <input
+          type="text"
+          id="ingredient-input"
+          placeholder="Enter an ingredient..."
+        />
+        <ul class="suggestions" class="suggestions-list"></ul>
+        <button id="add-ingredient">Add</button>
+      </div>
+
+      <ul id="ingredient-list"></ul>
+
+      <button id="find-recipes">Find Recipes</button>
+      <button class="clear-ingredients">Clear</button>
+
+      <div id="recipes"></div>
+      <div class="spinner" style="display: none"></div>
+    </div>
+
+    <script src="app.js"></script>
   </body>
 </html>
