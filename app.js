@@ -186,3 +186,13 @@ function showModal(details) {
 
   modal.classList.remove("hidden");
 }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const isModalVisible = !modal.classList.contains("hidden");
+    if (isModalVisible) {
+      modal.classList.add("hidden");
+      modalBody.innerHTML = "";
+    }
+  }
+});
