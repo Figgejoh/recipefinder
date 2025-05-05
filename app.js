@@ -68,6 +68,7 @@ findRecipesBtn.addEventListener("click", async () => {
   try {
     const res = await fetch(url);
     const data = await res.json();
+
     displayRecipes(data);
   } catch (error) {
     console.error("Error fetching recipies:", error);
@@ -90,7 +91,7 @@ function displayRecipes(recipes) {
 
   if (recipes.length === 0) {
     recipesContainer.innerHTML =
-      "<p>No recpies found. Try adding more ingredients</p>";
+      "<p>No recipies found. Try adding more ingredients. Remember to add the recipes you love to your favorites.</p>";
     return;
   }
 
@@ -118,6 +119,17 @@ function displayRecipes(recipes) {
       icon.classList.toggle("fas");
       icon.classList.toggle("far");
     });
+
+    div.addEventListener("click", async () => {
+      const infoUrl = `https://api.spoonacular.com/recipes/${recipe.id}/information?apiKey=${API_KEY}`;
+      try {
+        const res = await fetch(infoUrl);
+        const details = await res.json();
+        showModal(details);
+      } catch (error) {
+        console.error("Error loading recipe details:", error);
+      }
+    });
   });
 }
 
@@ -144,4 +156,33 @@ document.querySelector(".show-favorites").addEventListener("click", () => {
   displayRecipes(favoriteRecipes);
 });
 
-// Sparar ingredienserna
+// Modal
+
+const modal = document.getElementById("recipe-modal");
+const modalBody = document.getElementById("modal-body");
+const closeModal = document.getElementById("close-modal");
+
+closeModal.addEventListener("click", () => {
+  modal.classList.add("hidden");
+  modalBody.innerHTML = "";
+});
+
+function showModal(details) {
+  const steps = details.analyzedInstructions?.[0]?.steps;
+
+  if (!steps || steps.length === 0) {
+    modalBody.innerHTML = `<h2>${details.title}</h2><p>No instructions found.</p>`;
+  } else {
+    modalBody.innerHTML = `
+    <h2>${details.title}</h2>
+    <img src="${details.image}" alt="${
+      details.title
+    } style="max-width: 100%; border-radius: 10px; margin: 10px 0;"
+    
+    <ol> ${steps.map((step) => `<li>${step.step}</li>`).join("")} </ol>
+    
+    `;
+  }
+
+  modal.classList.remove("hidden");
+}
