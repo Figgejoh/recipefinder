@@ -6,6 +6,8 @@ const recipesContainer = document.getElementById("recipes");
 const spinner = document.querySelector(".spinner");
 const clearBtn = document.querySelector(".clear-ingredients");
 
+let favoriteRecipes = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
+
 const userIngredients = [];
 
 const API_KEY = "5b1ec75c374f4bc4bea47da8588624f1";
@@ -13,6 +15,12 @@ const API_KEY = "5b1ec75c374f4bc4bea47da8588624f1";
 // Lägga till ingredienser i lista
 function addIngredient() {
   const ingredient = ingredientInput.value.trim().toLowerCase();
+
+  if (!ingredient) {
+    alert("Please add an ingredient");
+    return;
+  }
+
   if (ingredient && !userIngredients.includes(ingredient)) {
     userIngredients.push(ingredient);
     const li = document.createElement("li");
@@ -27,11 +35,6 @@ function addIngredient() {
     });
     ingredientList.appendChild(li);
     ingredientInput.value = "";
-  }
-
-  if (!ingredient) {
-    alert("Please add an ingredient");
-    return;
   }
 }
 
@@ -67,13 +70,18 @@ findRecipesBtn.addEventListener("click", async () => {
     const data = await res.json();
     displayRecipes(data);
   } catch (error) {
-    console.error("Error fetching recpies:", error);
+    console.error("Error fetching recipies:", error);
     recipesContainer.innerHTML =
       "<p>Failed to fetch  recipes. Try again later.</p>";
   } finally {
     spinner.style.display = "none";
   }
 });
+
+// Favorisera en rätt
+function isFavorite(id) {
+  return favoriteRecipes.some((recipe) => recipe.id === id);
+}
 
 // Visar recepten
 
@@ -94,12 +102,35 @@ function displayRecipes(recipes) {
     div.innerHTML = `
     <img src='${recipe.image}' alt='${recipe.title}'>
     <a href="https://spoonacular.com/recipes/${recipe.title
-      .replace(/\s+g/g, "-")
+      .replace(/\s+/g, "-")
       .toLowerCase()}-${recipe.id}" target="_blank">${recipe.title}</a>
+      <button class="favorite-btn" data-id="${recipe.id}">
+      <i class="fa${isFavorite(recipe.id) ? "s" : "r"} fa-heart"></i>
+      </button>
     `;
 
     recipesContainer.appendChild(div);
+
+    const favBtn = div.querySelector(".favorite-btn");
+    favBtn.addEventListener("click", () => {
+      toggleFavorite(recipe);
+      const icon = favBtn.querySelector("i");
+      icon.classList.toggle("fas");
+      icon.classList.toggle("far");
+    });
   });
+}
+
+// Toggla favorite av och på
+
+function toggleFavorite(recipe) {
+  const index = favoriteRecipes.findIndex((r) => r.id === recipe.id);
+  if (index > -1) {
+    favoriteRecipes.splice(index, 1); // Remove
+  } else {
+    favoriteRecipes.push(recipe); // add
+  }
+  localStorage.setItem("favoriteRecipes", JSON.stringify(favoriteRecipes));
 }
 
 // Ta bort alla ingredienser
@@ -108,8 +139,9 @@ clearBtn.addEventListener("click", () => {
   userIngredients.length = 0;
   ingredientList.innerHTML = "";
 });
-// Spara-funktioner
+// Visar favorite-recepten
+document.querySelector(".show-favorites").addEventListener("click", () => {
+  displayRecipes(favoriteRecipes);
+});
 
 // Sparar ingredienserna
-
-// Favorisera en rätt

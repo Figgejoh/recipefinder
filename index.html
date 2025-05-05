@@ -18,12 +18,14 @@
       <h1>Find Recipes with Ingredients You Have</h1>
 
       <div class="input-area">
+        <label for="ingredient-input" class="visually-hidden">Ingredient</label>
         <input
           type="text"
           id="ingredient-input"
           placeholder="Enter an ingredient..."
+          autofocus
         />
-        <ul class="suggestions" class="suggestions-list"></ul>
+        <ul class="suggestions"></ul>
         <button id="add-ingredient">Add</button>
       </div>
 
@@ -31,6 +33,7 @@
 
       <button id="find-recipes">Find Recipes</button>
       <button class="clear-ingredients">Clear</button>
+      <button class="show-favorites">Show Favorites</button>
 
       <div id="recipes"></div>
       <div class="spinner" style="display: none"></div>
