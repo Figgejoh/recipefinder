@@ -5,16 +5,18 @@ const findRecipesBtn = document.getElementById("find-recipes");
 const recipesContainer = document.getElementById("recipes");
 const spinner = document.querySelector(".spinner");
 const clearBtn = document.querySelector(".clear-ingredients");
+const dietFilter = document.getElementById("diet-filter");
 
 let favoriteRecipes = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
 
 const userIngredients = [];
 
 const API_KEY = "5b1ec75c374f4bc4bea47da8588624f1";
-
 // Lägga till ingredienser i lista
 function addIngredient() {
-  const ingredient = ingredientInput.value.trim().toLowerCase();
+  const ingredient =
+    ingredientInput.value.trim().charAt(0).toUpperCase() +
+    ingredientInput.value.trim().slice(1);
 
   if (!ingredient) {
     alert("Please add an ingredient");
@@ -48,14 +50,17 @@ ingredientInput.addEventListener("keydown", (e) => {
 
 // Förslag på ingrediens
 
-// Stäng förslag när man klickar utanför
-
 // Söka efter recepten baserat på vilka ingredienser du har skrivit ned
 findRecipesBtn.addEventListener("click", async () => {
   if (userIngredients.length === 0) {
     alert("Please add some ingredients first!");
     return;
   }
+  // Select by diet not working, fixa senare
+  // const query = userIngredients.join(",");
+  // const selectedDiet = dietFilter.value;
+  // const diet = selectedDiet; // e.g., "vegan", "vegetarian", etc.
+  // const url = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${query}&number=10&diet=${selectedDiet}&addRecipeInformation=true&apiKey=${API_KEY}`;
 
   const query = userIngredients.join(",");
   const url = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${query}&number=10&apiKey=${API_KEY}`;
@@ -113,11 +118,19 @@ function displayRecipes(recipes) {
     recipesContainer.appendChild(div);
 
     const favBtn = div.querySelector(".favorite-btn");
-    favBtn.addEventListener("click", () => {
+
+    favBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       toggleFavorite(recipe);
       const icon = favBtn.querySelector("i");
       icon.classList.toggle("fas");
       icon.classList.toggle("far");
+
+      icon.classList.add("heart-animate");
+
+      icon.addEventListener("animationend", () => {
+        icon.classList.remove("heart-animate"), { once: true };
+      });
     });
 
     div.addEventListener("click", async () => {
@@ -150,6 +163,7 @@ function toggleFavorite(recipe) {
 clearBtn.addEventListener("click", () => {
   userIngredients.length = 0;
   ingredientList.innerHTML = "";
+  recipesContainer.innerHTML = "";
 });
 // Visar favorite-recepten
 document.querySelector(".show-favorites").addEventListener("click", () => {
